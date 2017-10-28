@@ -1,7 +1,6 @@
-/* eslint-disable global-require */
 module.exports = {
     rules: {
-        'brace-style': require('./custom-rules/brace-style'),
-        indent: require('./custom-rules/indent'),
+        'brace-style': require('./rules/brace-style'),
+        indent: require('./rules/indent'),
     },
 };
