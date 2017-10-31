@@ -15,9 +15,9 @@
 // Requirements
 // ------------------------------------------------------------------------------
 
-const lodash = require('../../eslint/node_modules/lodash');
+const lodash = require('lodash');
 const astUtils = require('../../eslint/lib/ast-utils');
-const createTree = require('../../eslint/node_modules/functional-red-black-tree');
+const createTree = require('functional-red-black-tree');
 
 // ------------------------------------------------------------------------------
 // Rule Definition
