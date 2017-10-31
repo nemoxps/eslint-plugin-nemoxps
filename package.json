@@ -6,7 +6,10 @@
     "author": "Pascal Hüttermann (https://github.com/nemoxps)",
     "license": "MIT",
     "main": "index.js",
-    "dependencies": {},
+    "dependencies": {
+        "lodash": "^4.17.4",
+        "functional-red-black-tree": "^1.0.1"
+    },
     "devDependencies": {
         "eslint": "^4.10.0"
     },
