@@ -102,7 +102,7 @@ const KNOWN_NODES = new Set([
     'ImportDeclaration',
     'ImportSpecifier',
     'ImportDefaultSpecifier',
-    'ImportNamespaceSpecifier'
+    'ImportNamespaceSpecifier',
 ]);
 
 /*
@@ -206,19 +206,19 @@ class TokenInfo {
     }
 
     /**
-    * Gets the first token on a given token's line
-    * @param {Token|ASTNode} token a node or token
-    * @returns {Token} The first token on the given line
-    */
+     * Gets the first token on a given token's line
+     * @param {Token|ASTNode} token a node or token
+     * @returns {Token} The first token on the given line
+     */
     getFirstTokenOfLine(token) {
         return this.firstTokensByLineNumber.get(token.loc.start.line);
     }
 
     /**
-    * Determines whether a token is the first token in its line
-    * @param {Token} token The token
-    * @returns {boolean} `true` if the token is the first on its line
-    */
+     * Determines whether a token is the first token in its line
+     * @param {Token} token The token
+     * @returns {boolean} `true` if the token is the first on its line
+     */
     isFirstTokenOfLine(token) {
         return this.getFirstTokenOfLine(token) === token;
     }
@@ -340,31 +340,31 @@ class OffsetStorage {
     }
 
     /**
-    * Sets the desired offset of all tokens in a range
-    * It's common for node listeners in this file to need to apply the same offset to a large, contiguous range of tokens.
-    * Moreover, the offset of any given token is usually updated multiple times (roughly once for each node that contains
-    * it). This means that the offset of each token is updated O(AST depth) times.
-    * It would not be performant to store and update the offsets for each token independently, because the rule would end
-    * up having a time complexity of O(number of tokens * AST depth), which is quite slow for large files.
-    *
-    * Instead, the offset tree is represented as a collection of contiguous offset ranges in a file. For example, the following
-    * list could represent the state of the offset tree at a given point:
-    *
-    * * Tokens starting in the interval [0, 15) are aligned with the beginning of the file
-    * * Tokens starting in the interval [15, 30) are offset by 1 indent level from the `bar` token
-    * * Tokens starting in the interval [30, 43) are offset by 1 indent level from the `foo` token
-    * * Tokens starting in the interval [43, 820) are offset by 2 indent levels from the `bar` token
-    * * Tokens starting in the interval [820, ∞) are offset by 1 indent level from the `baz` token
-    *
-    * The `setDesiredOffsets` methods inserts ranges like the ones above. The third line above would be inserted by using:
-    * `setDesiredOffsets([30, 43], fooToken, 1);`
-    *
-    * @param {[number, number]} range A [start, end] pair. All tokens with range[0] <= token.start < range[1] will have the offset applied.
-    * @param {Token} fromToken The token that this is offset from
-    * @param {number} offset The desired indent level
-    * @param {boolean} force `true` if this offset should not use the normal collapsing behavior. This should almost always be false.
-    * @returns {void}
-    */
+     * Sets the desired offset of all tokens in a range
+     * It's common for node listeners in this file to need to apply the same offset to a large, contiguous range of tokens.
+     * Moreover, the offset of any given token is usually updated multiple times (roughly once for each node that contains
+     * it). This means that the offset of each token is updated O(AST depth) times.
+     * It would not be performant to store and update the offsets for each token independently, because the rule would end
+     * up having a time complexity of O(number of tokens * AST depth), which is quite slow for large files.
+     *
+     * Instead, the offset tree is represented as a collection of contiguous offset ranges in a file. For example, the following
+     * list could represent the state of the offset tree at a given point:
+     *
+     * * Tokens starting in the interval [0, 15) are aligned with the beginning of the file
+     * * Tokens starting in the interval [15, 30) are offset by 1 indent level from the `bar` token
+     * * Tokens starting in the interval [30, 43) are offset by 1 indent level from the `foo` token
+     * * Tokens starting in the interval [43, 820) are offset by 2 indent levels from the `bar` token
+     * * Tokens starting in the interval [820, ∞) are offset by 1 indent level from the `baz` token
+     *
+     * The `setDesiredOffsets` methods inserts ranges like the ones above. The third line above would be inserted by using:
+     * `setDesiredOffsets([30, 43], fooToken, 1);`
+     *
+     * @param {[number, number]} range A [start, end] pair. All tokens with range[0] <= token.start < range[1] will have the offset applied.
+     * @param {Token} fromToken The token that this is offset from
+     * @param {number} offset The desired indent level
+     * @param {boolean} force `true` if this offset should not use the normal collapsing behavior. This should almost always be false.
+     * @returns {void}
+     */
     setDesiredOffsets(range, fromToken, offset, force) {
         /*
          * Offset ranges are stored as a collection of nodes, where each node maps a numeric key to an offset
@@ -412,17 +412,19 @@ class OffsetStorage {
     }
 
     /**
-    * Gets the desired indent of a token
-    * @param {Token} token The token
-    * @returns {string} The desired indent of the token
-    */
+     * Gets the desired indent of a token
+     * @param {Token} token The token
+     * @returns {string} The desired indent of the token
+     */
     getDesiredIndent(token) {
         if (!this._desiredIndentCache.has(token))
         
           if (this._ignoredTokens.has(token))
           {
-            // If the token is ignored, use the actual indent of the token as the desired indent.
-            // This ensures that no errors are reported for this token.
+                /*
+                 * If the token is ignored, use the actual indent of the token as the desired indent.
+                 * This ensures that no errors are reported for this token.
+                 */
             this._desiredIndentCache.set(
                 token,
                 this._tokenInfo.getTokenIndent(token)
@@ -435,7 +437,7 @@ class OffsetStorage {
             this._desiredIndentCache.set(
                 token,
 
-                // (indentation for the first element's line)
+                    // (indentation for the first element's line)
                 this.getDesiredIndent(this._tokenInfo.getFirstTokenOfLine(firstToken)) +
 
                         // (space between the start of the first element's line and the first element)
@@ -461,10 +463,10 @@ class OffsetStorage {
     }
 
     /**
-    * Ignores a token, preventing it from being reported.
-    * @param {Token} token The token
-    * @returns {void}
-    */
+     * Ignores a token, preventing it from being reported.
+     * @param {Token} token The token
+     * @returns {void}
+     */
     ignoreToken(token) {
         if (this._tokenInfo.isFirstTokenOfLine(token))
         
@@ -489,7 +491,7 @@ const ELEMENT_LIST_SCHEMA = {
         },
         {
             enum: ['first', 'off'],
-        }
+        },
     ],
 };
 
@@ -499,6 +501,7 @@ module.exports = {
             description: 'enforce consistent indentation',
             category: 'Stylistic Issues',
             recommended: false,
+            url: 'https://eslint.org/docs/rules/indent',
         },
 
         fixable: 'whitespace',
@@ -512,7 +515,7 @@ module.exports = {
                     {
                         type: 'integer',
                         minimum: 0,
-                    }
+                    },
                 ],
             },
             {
@@ -545,7 +548,7 @@ module.exports = {
                                     },
                                 },
                                 additionalProperties: false,
-                            }
+                            },
                         ],
                     },
                     outerIIFEBody: {
@@ -560,7 +563,7 @@ module.exports = {
                             },
                             {
                                 enum: ['off'],
-                            }
+                            },
                         ],
                     },
                     FunctionDeclaration: {
@@ -615,9 +618,12 @@ module.exports = {
                             },
                         },
                     },
+                    ignoreComments: {
+                        type: 'boolean',
+                    },
                 },
                 additionalProperties: false,
-            }
+            },
         ],
     },
 
@@ -656,6 +662,7 @@ module.exports = {
             ImportDeclaration: 1,
             flatTernaryExpressions: false,
             ignoredNodes: [],
+            ignoreComments: false,
         };
 
         if (context.options.length)
@@ -705,8 +712,10 @@ module.exports = {
 
             if (actualSpaces > 0)
             
-              // Abbreviate the message if the expected indentation is also spaces.
-              // e.g. 'Expected 4 spaces but found 2' rather than 'Expected 4 spaces but found 2 spaces'
+                /*
+                 * Abbreviate the message if the expected indentation is also spaces.
+                 * e.g. 'Expected 4 spaces but found 2' rather than 'Expected 4 spaces but found 2 spaces'
+                 */
               foundStatement = indentType === 'space' ? actualSpaces : `${actualSpaces} ${foundSpacesWord}`;
             
             else if (actualTabs > 0)
@@ -799,19 +808,19 @@ module.exports = {
         }
 
         /**
-        * Check indentation for lists of elements (arrays, objects, function params)
-        * @param {ASTNode[]} elements List of elements that should be offset
-        * @param {Token} startToken The start token of the list that element should be aligned against, e.g. '['
-        * @param {Token} endToken The end token of the list, e.g. ']'
-        * @param {number|string} offset The amount that the elements should be offset
-        * @returns {void}
-        */
+         * Check indentation for lists of elements (arrays, objects, function params)
+         * @param {ASTNode[]} elements List of elements that should be offset
+         * @param {Token} startToken The start token of the list that element should be aligned against, e.g. '['
+         * @param {Token} endToken The end token of the list, e.g. ']'
+         * @param {number|string} offset The amount that the elements should be offset
+         * @returns {void}
+         */
         function addElementListIndent(elements, startToken, endToken, offset) {
             /**
-            * Gets the first token of a given element, including surrounding parentheses.
-            * @param {ASTNode} element A node in the `elements` list
-            * @returns {Token} The first token of this element
-            */
+             * Gets the first token of a given element, including surrounding parentheses.
+             * @param {ASTNode} element A node in the `elements` list
+             * @returns {Token} The first token of this element
+             */
             function getFirstToken(element) {
                 let token = sourceCode.getTokenBefore(element);
 
@@ -838,12 +847,12 @@ module.exports = {
             elements.forEach((element, index) => {
                 if (!element)
                 
-                  // Skip holes in arrays
+                    // Skip holes in arrays
                   return;
                 
                 if (offset === 'off')
                 
-                  // Ignore the first token of every element if the "off" option is used
+                    // Ignore the first token of every element if the "off" option is used
                   offsets.ignoreToken(getFirstToken(element));
                 
 
@@ -893,7 +902,7 @@ module.exports = {
 
               offsets.setDesiredOffsets([firstBodyToken.range[0], lastBodyToken.range[1]], lastParentToken, 1);
 
-              /*
+                /*
                  * For blockless nodes with semicolon-first style, don't indent the semicolon.
                  * e.g.
                  * if (foo) bar()
@@ -908,10 +917,10 @@ module.exports = {
         }
 
         /**
-        * Checks the indentation for nodes that are like function calls (`CallExpression` and `NewExpression`)
-        * @param {ASTNode} node A CallExpression or NewExpression node
-        * @returns {void}
-        */
+         * Checks the indentation for nodes that are like function calls (`CallExpression` and `NewExpression`)
+         * @param {ASTNode} node A CallExpression or NewExpression node
+         * @returns {void}
+         */
         function addFunctionCallIndent(node) {
             let openingParen;
 
@@ -933,10 +942,10 @@ module.exports = {
         }
 
         /**
-        * Checks the indentation of parenthesized values, given a list of tokens in a program
-        * @param {Token[]} tokens A list of tokens
-        * @returns {void}
-        */
+         * Checks the indentation of parenthesized values, given a list of tokens in a program
+         * @param {Token[]} tokens A list of tokens
+         * @returns {void}
+         */
         function addParensIndent(tokens) {
             const parenStack = [];
             const parenPairs = [];
@@ -973,11 +982,11 @@ module.exports = {
         }
 
         /**
-        * Ignore all tokens within an unknown node whose offset do not depend
-        * on another token's offset within the unknown node
-        * @param {ASTNode} node Unknown Node
-        * @returns {void}
-        */
+         * Ignore all tokens within an unknown node whose offset do not depend
+         * on another token's offset within the unknown node
+         * @param {ASTNode} node Unknown Node
+         * @returns {void}
+         */
         function ignoreNode(node) {
             const unknownNodeTokens = new Set(sourceCode.getTokens(node, { includeComments: true }));
 
@@ -1072,10 +1081,10 @@ module.exports = {
                 const operator = sourceCode.getFirstTokenBetween(node.left, node.right, (token) => token.value === node.operator);
 
                 /*
-                * For backwards compatibility, don't check BinaryExpression indents, e.g.
-                * var foo = bar &&
-                *                   baz;
-                */
+                 * For backwards compatibility, don't check BinaryExpression indents, e.g.
+                 * var foo = bar &&
+                 *                   baz;
+                 */
 
                 const tokenAfterOperator = sourceCode.getTokenAfter(operator);
 
@@ -1159,7 +1168,7 @@ module.exports = {
 
                   offsets.setDesiredOffset(firstConsequentToken, firstToken, 1);
 
-                  /*
+                    /*
                      * The alternate and the consequent should usually have the same indentation.
                      * If they share part of a line, align the alternate against the first token of the consequent.
                      * This allows the alternate to be indented correctly in cases like this:
@@ -1175,7 +1184,7 @@ module.exports = {
                   
                   else
                   
-                    /**
+                        /**
                          * If the alternate and consequent do not share part of a line, offset the alternate from the first
                          * token of the conditional expression. For example:
                          * foo ? bar
@@ -1199,12 +1208,12 @@ module.exports = {
                 {
                   const closingCurly = sourceCode.getLastToken(node, astUtils.isClosingBraceToken);
 
-                  // Indent the specifiers in `export {foo, bar, baz}`
+                    // Indent the specifiers in `export {foo, bar, baz}`
                   addElementListIndent(node.specifiers, sourceCode.getFirstToken(node, { skip: 1 }), closingCurly, 1);
 
                   if (node.source)
                   
-                    // Indent everything after and including the `from` token in `export {foo, bar, baz} from 'qux'`
+                        // Indent everything after and including the `from` token in `export {foo, bar, baz} from 'qux'`
                     offsets.setDesiredOffsets([closingCurly.range[1], node.range[1]], sourceCode.getFirstToken(node), 1);
                 }
             },
@@ -1273,7 +1282,7 @@ module.exports = {
 
                 if (node.computed)
                 {
-                  // For computed MemberExpressions, match the closing bracket with the opening bracket.
+                    // For computed MemberExpressions, match the closing bracket with the opening bracket.
                   offsets.setDesiredOffset(sourceCode.getLastToken(node), firstNonObjectToken, 0);
                   offsets.setDesiredOffsets(node.property.range, firstNonObjectToken, 1);
                 }
@@ -1293,10 +1302,10 @@ module.exports = {
 
                 if (typeof options.MemberExpression === 'number')
                 {
-                  // Match the dot (for non-computed properties) or the opening bracket (for computed properties) against the object.
+                    // Match the dot (for non-computed properties) or the opening bracket (for computed properties) against the object.
                   offsets.setDesiredOffset(firstNonObjectToken, offsetBase, options.MemberExpression);
 
-                  /*
+                    /*
                      * For computed MemberExpressions, match the first token of the property against the opening bracket.
                      * Otherwise, match the first token of the property against the object.
                      */
@@ -1304,11 +1313,11 @@ module.exports = {
                 }
                 else
                 {
-                  // If the MemberExpression option is off, ignore the dot and the first token of the property.
+                    // If the MemberExpression option is off, ignore the dot and the first token of the property.
                   offsets.ignoreToken(firstNonObjectToken);
                   offsets.ignoreToken(secondNonObjectToken);
 
-                  // To ignore the property indentation, ensure that the property tokens depend on the ignored tokens.
+                    // To ignore the property indentation, ensure that the property tokens depend on the ignored tokens.
                   offsets.setDesiredOffset(firstNonObjectToken, offsetBase, 0);
                   offsets.setDesiredOffset(secondNonObjectToken, firstNonObjectToken, 0);
                 }
@@ -1375,7 +1384,7 @@ module.exports = {
 
                 if (node.declarations[node.declarations.length - 1].loc.start.line > node.loc.start.line)
                 {
-                  /*
+                    /*
                      * VariableDeclarator indentation is a bit different from other forms of indentation, in that the
                      * indentation of an opening bracket sometimes won't match that of a closing bracket. For example,
                      * the following indentations are correct:
@@ -1497,9 +1506,7 @@ module.exports = {
              * To avoid this, the `Identifier` listener isn't called until traversal finishes and all
              * ignored nodes are known.
              */
-            (listener) =>
-              (node) =>
-                listenerCallQueue.push({ listener, node })
+            (listener) => (node) => listenerCallQueue.push({ listener, node })
         );
 
         // For each ignored node selector, set up a listener to collect it into the `ignoredNodes` set.
@@ -1530,6 +1537,13 @@ module.exports = {
                       ignoredNodes.add(node);
                 },
                 'Program:exit'() {
+                    // If ignoreComments option is enabled, ignore all comment tokens.
+                    if (options.ignoreComments)
+                    
+                      sourceCode.getAllComments()
+                        .forEach((comment) => offsets.ignoreToken(comment));
+                    
+
                     // Invoke the queued offset listeners for the nodes that aren't ignored.
                     listenerCallQueue
                       .filter((nodeInfo) => !ignoredNodes.has(nodeInfo.node))
@@ -1555,7 +1569,7 @@ module.exports = {
 
                         if (!tokenInfo.firstTokensByLineNumber.has(lineNumber))
                         
-                          // Don't check indentation on blank lines
+                            // Don't check indentation on blank lines
                           return;
                         
 
@@ -1563,7 +1577,7 @@ module.exports = {
 
                         if (firstTokenOfLine.loc.start.line !== lineNumber)
                         
-                          // Don't check the indentation of multi-line tokens (e.g. template literals or block comments) twice.
+                            // Don't check the indentation of multi-line tokens (e.g. template literals or block comments) twice.
                           return;
                         
 
@@ -1578,7 +1592,7 @@ module.exports = {
                           const tokenBefore = precedingTokens.get(firstTokenOfLine);
                           const tokenAfter = tokenBefore ? sourceCode.getTokenAfter(tokenBefore) : sourceCode.ast.tokens[0];
 
-                          // If a comment matches the expected indentation of the token immediately before or after, don't report it.
+                            // If a comment matches the expected indentation of the token immediately before or after, don't report it.
                           if (
                             tokenBefore && validateTokenIndent(firstTokenOfLine, offsets.getDesiredIndent(tokenBefore)) ||
                                 tokenAfter && validateTokenIndent(firstTokenOfLine, offsets.getDesiredIndent(tokenAfter))

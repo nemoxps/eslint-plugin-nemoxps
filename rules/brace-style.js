@@ -38,7 +38,7 @@ module.exports = {
                     },
                 },
                 additionalProperties: false,
-            }
+            },
         ],
 
         fixable: 'whitespace',

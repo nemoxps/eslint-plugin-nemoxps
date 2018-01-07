@@ -11,10 +11,10 @@
         "lodash": "^4.17.4"
     },
     "devDependencies": {
-        "eslint": "^4.10.0"
+        "eslint": "^4.15.0"
     },
     "peerDependencies": {
-        "eslint": "^4.10.0"
+        "eslint": "^4.15.0"
     },
     "scripts": {
         "test:lint": "eslint ./",
